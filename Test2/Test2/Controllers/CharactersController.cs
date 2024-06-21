@@ -40,7 +40,7 @@ public class CharactersController : ControllerBase
    }
    
    [HttpPost("{characterid:int}/backpacks")]
-   public Task<bool> AddNewItem(List<int> List_ids,int characterid)
+   public Task<IActionResult> AddNewItem(List<int> List_ids,int characterid)
    {
       throw new NotImplementedException();
    }
