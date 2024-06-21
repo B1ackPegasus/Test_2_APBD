@@ -40,8 +40,22 @@ public class CharactersController : ControllerBase
    }
    
    [HttpPost("{characterid:int}/backpacks")]
-   public Task<IActionResult> AddNewItem(List<int> List_ids,int characterid)
+   public async Task<IActionResult> AddNewItem(List<int> List_ids,int characterid)
    {
-      throw new NotImplementedException();
+      var result = await _dbService.AddNewItem(List_ids, characterid);
+      if (!result)
+      {
+         return NotFound("List contains an item that does not exist");
+      }
+
+      var ItemList = _dbService.GetCharacterInfo(characterid).Result.ListBackpacks
+         .Where(e => List_ids.Contains(e.Item.Id)).ToList();
+      var resultList = ItemList.Select(e => new AddItemDTO()
+      {
+         Amount = e.Amount,
+         ItemId = e.ItemId,
+         CharacterId = e.CharacterId
+      });
+      return Ok(resultList);
    }
 }

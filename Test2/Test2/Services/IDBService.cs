@@ -6,5 +6,5 @@ public interface IDBService
 {
     public Task<Character> GetCharacterInfo(int id);
 
-    public Task<bool> AddNewItem(List<int> List_ids);
+    public Task<bool> AddNewItem(List<int> List_ids, int characterId);
 }

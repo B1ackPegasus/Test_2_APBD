@@ -24,9 +24,58 @@ public class DBService : IDBService
         return character;
     }
 
-    public Task<bool> AddNewItem(List<int> List_ids)
+    public async Task<bool> AddNewItem(List<int> List_ids, int characterId)
     {
-        throw new NotImplementedException();
+        var ItemsList = await _context.Item.Where(e => List_ids.Contains(e.Id)).ToListAsync();
+        
+        if (List_ids.Count != List_ids.Count)
+        {
+            return false;
+        }
+
+        var character = await _context.Character.Include(e => e.ListBackpacks).Where(e => e.Id == characterId).FirstOrDefaultAsync();
+
+        if (character == null)
+        {
+            return false;
+        }
+
+        var weight = 0;
+        
+        foreach (var item in ItemsList)
+        {
+            weight += item.Weight;
+        }
+
+        var capacity = character.MaxWeight - character.CurrentWeight;
+
+        if (weight > capacity)
+        {
+            return false;
+        }
+
+        character.CurrentWeight += weight;
+
+        foreach (var item in ItemsList)
+        {
+            var currentItem = character.ListBackpacks.Where(e => e.ItemId == item.Id).FirstOrDefault();
+            if (currentItem != null)
+            {
+                currentItem.Amount += 1;
+            }
+            else
+            {
+                character.ListBackpacks.Add(new Backpack()
+                {
+                    CharacterId = characterId,
+                    Item = item,
+                    Amount = 1
+                });
+            }
+        }
+        
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     
